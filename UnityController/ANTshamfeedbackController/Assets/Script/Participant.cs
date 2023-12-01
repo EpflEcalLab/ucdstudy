@@ -60,3 +60,42 @@ public class Training
     public int nbClickedAtTheEnd = 0;
     public float lenghtRecorded = 0;
 }
+
+public class OSCLookUpTable
+{
+    public static int GetIntValueAccordingToInputStringFeedbackType(string a_input)
+    {
+        if(a_input == "Tbor")
+        {
+            return 0;
+        }
+        if (a_input == "Tbad")
+        {
+            return 1;
+        }
+        if (a_input == "Tgoo")
+        {
+            return 2;
+        }
+        if (a_input == "Tpas")
+        {
+            return 3;
+        }
+
+        return -1;
+    }
+
+    public static int GetIntValueAccordingToInputStringSessionType(string a_input)
+    {
+        if (a_input == "Success")
+        {
+            return 0;
+        }
+        if (a_input == "Failed")
+        {
+            return 1;
+        }
+
+        return -1;
+    }
+}

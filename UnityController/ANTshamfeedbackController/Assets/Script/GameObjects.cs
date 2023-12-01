@@ -12,17 +12,13 @@ public class GameObjects : MonoBehaviour
     public GameObject InputFieldForParticipantID;
 
     //Feedback Type
-    public Toggle Tbor;
-    public Toggle Tbad;
-    public Toggle Tgoo;
-    public Toggle Tpas;
+    public ToggleGroup FeedbackToogleGroup;
 
     //Session Type
-    public Toggle Sucess;
-    public Toggle Failed;
+    public ToggleGroup SessionTypeToogleGroup;
 
-    public Toggle FixedLenght;
-    public Toggle UserChoiceLenght;
+    //lenght
+    public ToggleGroup LenghtToogleGroup;
 
     public TextMeshProUGUI SummaryText;
     public TextMeshProUGUI EllapsedTimeInExperienceText;
@@ -58,17 +54,6 @@ public class GameObjects : MonoBehaviour
     {
         participantID.text = string.Empty;
         EllapsedTimeInExperienceText.text = string.Empty;
-
-        Tbor.isOn = false;
-        Tbad.isOn = false;
-        Tgoo.isOn = false;
-        Tpas.isOn = false;
-
-        Sucess.isOn = false;
-        Failed.isOn = false;
-
-        FixedLenght.isOn = false;
-        UserChoiceLenght.isOn = false;
     }
 
     public void Update()
@@ -149,18 +134,10 @@ public class GameObjects : MonoBehaviour
 
     private void InformGameManagerExperimentStarted()
     {
-        List<string> listToogleOn = new List<string>();
-        foreach (Toggle toggle in Toggles)
-        {
-            if (toggle.isOn)
-            {
-                listToogleOn.Add(toggle.name);
-            }
-        }
-        listToogleOn.Reverse();
-
         GameManager.Instance.OnExperimentStarted(participantID.text, 
-            listToogleOn[0], listToogleOn[2], listToogleOn[1]);
+            FeedbackToogleGroup.ActiveToggles().FirstOrDefault().name, 
+            LenghtToogleGroup.ActiveToggles().FirstOrDefault().name, 
+            SessionTypeToogleGroup.ActiveToggles().FirstOrDefault().name);
     }
 
     private void InformGameManagerExperimentEnded()

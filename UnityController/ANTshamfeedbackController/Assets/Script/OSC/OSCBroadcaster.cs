@@ -28,8 +28,8 @@ public class OSCBroadcaster : UniOSCEventDispatcher
     {
         ClearData();
 
-        AppendData(a_feedbackType);
-        AppendData(a_sessionType);
+        AppendData(OSCLookUpTable.GetIntValueAccordingToInputStringFeedbackType(a_feedbackType));
+        AppendData(OSCLookUpTable.GetIntValueAccordingToInputStringSessionType(a_sessionType));
 
         OscMessage msg = ((OscMessage)_OSCeArg.Packet);
         msg.Address = OSCAddress.StartExperiment;
@@ -40,6 +40,8 @@ public class OSCBroadcaster : UniOSCEventDispatcher
     {
         ClearData();
 
+        AppendData(4);
+
         OscMessage msg = ((OscMessage)_OSCeArg.Packet);
         msg.Address = OSCAddress.StopExperiment;
         _SendOSCMessage(_OSCeArg);
@@ -48,6 +50,8 @@ public class OSCBroadcaster : UniOSCEventDispatcher
     public void SendButtonClicked()
     {
         ClearData();
+
+        AppendData(4);
 
         OscMessage msg = ((OscMessage)_OSCeArg.Packet);
         msg.Address = OSCAddress.ButtonClicked;
