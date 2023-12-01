@@ -10,7 +10,7 @@ public class GameManager : Singleton<GameManager>
     public string currentParticipantID = string.Empty;
 
     public GameObjects gameObjects;
-   
+    public OSCBroadcaster OSCBroadcaster;
 
     public void Start()
     {
@@ -18,6 +18,8 @@ public class GameManager : Singleton<GameManager>
 
         DatabaseHandler v_databaseHandeler = gameObject.AddComponent<DatabaseHandler>();
         v_databaseHandeler.Init();
+
+        OSCBroadcaster = GameObject.FindAnyObjectByType<OSCBroadcaster>();
     }
 
     public void OnExperimentStarted(string a_participantID, string a_feedbackType, string a_lenghtType,
@@ -36,6 +38,8 @@ public class GameManager : Singleton<GameManager>
             v_newParticipant.OnExperimentStarted(a_feedbackType, a_lenghtType, a_sessionType);
             participantsList.Add(v_newParticipant);
         }
+
+        OSCBroadcaster.StartExperimentWithConfig(a_feedbackType, a_sessionType);
     }
 
     public void OnExperimentStopped(string a_participantID)
@@ -56,6 +60,8 @@ public class GameManager : Singleton<GameManager>
                 "Can't find participant ID:\n " + a_participantID + "\n\n session not recorded",
                 Color.red);
         }
+
+        OSCBroadcaster.StopExperiment();
     }
 
     public void OnUserClicked()
@@ -64,5 +70,7 @@ public class GameManager : Singleton<GameManager>
         {
             participantsList.Find(x => x.ID == currentParticipantID).OnUserClicked();
         }
+
+        OSCBroadcaster.SendButtonClicked();
     }
 }
