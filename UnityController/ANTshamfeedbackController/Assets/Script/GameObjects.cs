@@ -9,6 +9,7 @@ public class GameObjects : MonoBehaviour
 {
     //Participant ID
     public TextMeshProUGUI participantID;
+    public GameObject InputFieldForParticipantID;
 
     //Feedback Type
     public Toggle Tbor;
@@ -36,6 +37,8 @@ public class GameObjects : MonoBehaviour
 
     public GameObject alertMenu;
     public Button closeAlertMenuButton;
+    public TextMeshProUGUI alertMessage;
+    public Image bgAlertMenu;
 
     public void Start()
     {
@@ -128,6 +131,9 @@ public class GameObjects : MonoBehaviour
             experimentIsRunning = false;
             StartStopButton.gameObject.GetComponent<Image>().color = Color.green;
             StartStopButton.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "START";
+            InputFieldForParticipantID.SetActive(true);
+
+            InformGameManagerExperimentEnded();
         }
         else
         {
@@ -135,11 +141,44 @@ public class GameObjects : MonoBehaviour
             experimentIsRunning = true;
             StartStopButton.gameObject.GetComponent<Image>().color = Color.red;
             StartStopButton.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "STOP";
+            InputFieldForParticipantID.SetActive(false);
+
+            InformGameManagerExperimentStarted();
         }
+    }
+
+    private void InformGameManagerExperimentStarted()
+    {
+        List<string> listToogleOn = new List<string>();
+        foreach (Toggle toggle in Toggles)
+        {
+            if (toggle.isOn)
+            {
+                listToogleOn.Add(toggle.name);
+            }
+        }
+        listToogleOn.Reverse();
+
+        GameManager.Instance.OnExperimentStarted(participantID.text, 
+            listToogleOn[0], listToogleOn[2], listToogleOn[1]);
+    }
+
+    private void InformGameManagerExperimentEnded()
+    {
+        GameManager.Instance.OnExperimentStopped(participantID.text);
     }
 
     private void OnCloseAlertMenuButtonPressed()
     {
         alertMenu.SetActive(false);
+    }
+
+
+    public void ShowAlertMenuWithMessage(string a_alertMessage, Color a_BGcolor)
+    {
+        alertMenu.SetActive(true);
+        alertMessage.text = a_alertMessage;
+
+        bgAlertMenu.color = a_BGcolor;
     }
 }
