@@ -316,7 +316,7 @@ MonoBehaviour:
   foldoutOSCOut: 1
   foldoutOSCIn: 1
   _isValidOscOutIPAddress: 1
-  _oscOutIPAddress: 10.251.1.131
+  _oscOutIPAddress: 127.0.0.1
   _isValidOscOutMulticastIPAddress: 1
   _oscOutMulticastIPAddress: 224.0.1.0
   _oscOutPort: 10000
@@ -340,7 +340,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sendInterval: 100
   _oscOutAddress: /
-  _oscOutIPAddress: 10.251.1.131
+  _oscOutIPAddress: 127.0.0.1
   _oscOutPort: 10000
   _useExplicitConnection: 0
   _explicitConnection: {fileID: 0}
