@@ -51,10 +51,32 @@ public class OSCBroadcaster : UniOSCEventDispatcher
     {
         ClearData();
 
-        AppendData(4);
+        AppendData(2);
 
         OscMessage msg = ((OscMessage)_OSCeArg.Packet);
         msg.Address = OSCAddress.ButtonClicked;
+        _SendOSCMessage(_OSCeArg);
+    }
+
+    public void ShowMessageMandatoryIsOverWaitForYou()
+    {
+        ClearData();
+
+        AppendData(2);
+
+        OscMessage msg = ((OscMessage)_OSCeArg.Packet);
+        msg.Address = OSCAddress.MandatoryOver;
+        _SendOSCMessage(_OSCeArg);
+    }
+
+    public void StartFreeExperiment()
+    {
+        ClearData();
+
+        AppendData(2);
+
+        OscMessage msg = ((OscMessage)_OSCeArg.Packet);
+        msg.Address = OSCAddress.StartFreeExperiment;
         _SendOSCMessage(_OSCeArg);
     }
     #endregion

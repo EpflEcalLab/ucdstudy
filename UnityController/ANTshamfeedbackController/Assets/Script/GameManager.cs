@@ -7,70 +7,190 @@ public class GameManager : Singleton<GameManager>
 {
     [SerializeField]
     public List<Participant> participantsList = new List<Participant>();
-    public string currentParticipantID = string.Empty;
 
-    public GameObjects gameObjects;
+    public string currentParticipantID = string.Empty;
+    public string currentSessionType = string.Empty;
+    public string currentFeedbackType = string.Empty;
+    public string currentLenghtType = string.Empty;
+
+    public UIManager sceneGameObjects;
     public OSCBroadcaster OSCBroadcaster;
 
+    public enum Status
+    {
+        OFF,
+        MANDATORY,
+        WAITFORUSERTOSTARTAGAIN,
+        FREE
+    };
+    public Status status = Status.OFF;
+
+    public float remainingTimeBeforeEndOfManadatory = 0;
+
+    #region INIT
     public void Start()
     {
-        gameObjects = GetComponent<GameObjects>();
+        sceneGameObjects = GetComponent<UIManager>();
 
         DatabaseHandler v_databaseHandeler = gameObject.AddComponent<DatabaseHandler>();
         v_databaseHandeler.Init();
 
         OSCBroadcaster = GameObject.FindAnyObjectByType<OSCBroadcaster>();
+        OSCBroadcaster.StopExperiment();
+    }
+    #endregion
+
+    #region UPDATE
+    public void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            Debug.Log("boring button pressed");
+            OnBoringButtonClicked();
+            
+        }
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            Debug.Log("Left button pressed");
+            OnLeftMouseButtonClicked();
+        }
+
+        UpdateMandatoryTiming();
+    }
+    #endregion
+
+    #region Participant Action
+    private void OnLeftMouseButtonClicked()
+    {
+        if(status == Status.WAITFORUSERTOSTARTAGAIN)
+        {
+            status = Status.FREE;
+            currentLenghtType = "Free";
+            OnStartExperiment();
+            OSCBroadcaster.StartFreeExperiment();
+            sceneGameObjects.OnLaunchFreeTimeSession();
+        }
+
+        else if(status == Status.FREE)
+        {
+            status = Status.OFF;
+            sceneGameObjects.OnStartStopExperimentButtonPressed();
+        }
     }
 
-    public void OnExperimentStarted(string a_participantID, string a_feedbackType, string a_lenghtType,
+    
+
+    public void OnBoringButtonClicked()
+    {
+        if (status == Status.MANDATORY)
+        {
+            if (participantsList.Any(x => x.ID == currentParticipantID))
+            {
+                participantsList.Find(x => x.ID == currentParticipantID).OnUserClickedBoringButtonDuringMandatoryMode();
+                sceneGameObjects.OnUserClickedBoringButtonInMandatoryMode(
+                    participantsList.Find(x => x.ID == currentParticipantID).GetTotalNumberOfClick());
+            }
+        }
+        else if(status == Status.FREE)
+        {
+            participantsList.Find(x => x.ID == currentParticipantID).OnUserClickedBoringButtonDuringMandatoryMode();
+            sceneGameObjects.OnUserClickedBoringButtonInFreeMode(
+                participantsList.Find(x => x.ID == currentParticipantID).GetTotalNumberOfClick());
+        }
+
+        OSCBroadcaster.SendButtonClicked();
+    }
+    #endregion
+
+    #region Student Action
+    public void OnStudentWishToStartExperiment(string a_participantID, string a_feedbackType, 
+        float a_lenghtSession,
         string a_sessionType)
     {
-        if(participantsList.Any(x => x.ID == a_participantID))
+        currentParticipantID = a_participantID;
+        currentFeedbackType = a_feedbackType;
+        currentLenghtType = "Fixed";
+        currentSessionType = a_sessionType;
+
+        OnStartExperiment();
+
+        OSCBroadcaster.StartExperimentWithConfig(a_feedbackType, a_sessionType);
+
+        remainingTimeBeforeEndOfManadatory = a_lenghtSession;
+        status = Status.MANDATORY;
+    }
+
+    public void OnStudentWishToStopExperiment(string a_participantID)
+    {
+        OnExperimentStopped(a_participantID);
+        OSCBroadcaster.StopExperiment();
+    }
+    #endregion
+
+    #region LOGIC
+    private void OnStartExperiment()
+    {
+        if (participantsList.Any(x => x.ID == currentParticipantID))
         {
-            currentParticipantID = a_participantID;
-            participantsList.Find(x => x.ID == a_participantID).OnExperimentStarted(a_feedbackType, a_lenghtType, a_sessionType);
+            participantsList.Find(x => x.ID == currentParticipantID).OnExperimentStarted(
+                currentFeedbackType, currentLenghtType, currentSessionType);
         }
         else
         {
             Participant v_newParticipant = new Participant();
-            currentParticipantID = a_participantID;
-            v_newParticipant.ID = a_participantID;
-            v_newParticipant.OnExperimentStarted(a_feedbackType, a_lenghtType, a_sessionType);
+            v_newParticipant.ID = currentParticipantID;
+            v_newParticipant.OnExperimentStarted(currentFeedbackType, 
+                currentLenghtType, currentSessionType);
             participantsList.Add(v_newParticipant);
         }
-
-        OSCBroadcaster.StartExperimentWithConfig(a_feedbackType, a_sessionType);
     }
 
-    public void OnExperimentStopped(string a_participantID)
+    private void OnMandatoryExperimentStopped()
+    {
+        OnExperimentStopped(currentParticipantID);
+        sceneGameObjects.OnMandatoryExperimentOver();
+        status = Status.WAITFORUSERTOSTARTAGAIN;
+
+        OSCBroadcaster.ShowMessageMandatoryIsOverWaitForYou();
+    }
+
+    private void OnExperimentStopped(string a_participantID)
     {
         if (participantsList.Any(x => x.ID == a_participantID))
         {
             currentParticipantID = a_participantID;
             participantsList.Find(x => x.ID == a_participantID).OnExperimentStopped();
 
-            gameObjects.ShowAlertMenuWithMessage(
+            sceneGameObjects.ShowAlertMenuWithMessage(
                 "participant ID:\n " + a_participantID + "\n\n session recorded",
                 Color.white);
         }
         else
         {
             Debug.LogError("Can't find participant with the ID");
-            gameObjects.ShowAlertMenuWithMessage(
+            sceneGameObjects.ShowAlertMenuWithMessage(
                 "Can't find participant ID:\n " + a_participantID + "\n\n session not recorded",
                 Color.red);
         }
-
-        OSCBroadcaster.StopExperiment();
     }
-
-    public void OnUserClicked()
+    private void UpdateMandatoryTiming()
     {
-        if (participantsList.Any(x => x.ID == currentParticipantID))
+        if (status == Status.MANDATORY)
         {
-            participantsList.Find(x => x.ID == currentParticipantID).OnUserClicked();
+            remainingTimeBeforeEndOfManadatory -= Time.deltaTime;
+            if (remainingTimeBeforeEndOfManadatory < 0)
+            {
+                OnMandatoryExperimentStopped();
+            }
         }
 
-        OSCBroadcaster.SendButtonClicked();
     }
+    #endregion
+
+
+
+
+
+
 }

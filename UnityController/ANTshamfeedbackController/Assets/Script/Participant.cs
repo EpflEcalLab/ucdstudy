@@ -34,16 +34,21 @@ public class Participant
             DatabaseHandler.Instance.RecordData(ID, v_currentTraining.feedbackType, v_currentTraining.lenghtType,
                 v_currentTraining.sessionType, v_currentTraining.timestampWhenStarted.ToString(), 
                 v_currentTraining.timestampWhenStopped.ToString(), v_currentTraining.timeAtStart.ToString(),
-                v_currentTraining.nbClickedAtTheEnd.ToString(), v_currentTraining.lenghtRecorded.ToString());
+                v_currentTraining.nbClicked.ToString(), v_currentTraining.lenghtRecorded.ToString());
         }
-
-
     }
 
-    public void OnUserClicked()
+    public void OnUserClickedBoringButtonDuringMandatoryMode()
     {
         Training v_currentTraining = trainingList.Last();
-        v_currentTraining.nbClickedAtTheEnd++;
+        v_currentTraining.nbClicked++;
+    }
+
+
+    public string GetTotalNumberOfClick()
+    {
+        Training v_currentTraining = trainingList.Last();
+        return v_currentTraining.nbClicked.ToString();
     }
 }
 
@@ -57,7 +62,8 @@ public class Training
     public System.DateTime timestampWhenStopped;
     public float timeAtStart;
 
-    public int nbClickedAtTheEnd = 0;
+    public int nbClicked = 0;
+
     public float lenghtRecorded = 0;
 }
 

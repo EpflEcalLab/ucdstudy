@@ -46,16 +46,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   participantID: {fileID: 0}
-  Tbor: {fileID: 0}
-  Tbad: {fileID: 0}
-  Tgoo: {fileID: 0}
-  Tpas: {fileID: 0}
-  Sucess: {fileID: 0}
-  Failed: {fileID: 0}
-  FixedLenght: {fileID: 0}
-  UserChoiceLenght: {fileID: 0}
+  InputFieldForParticipantID: {fileID: 0}
+  FeedbackToogleGroup: {fileID: 0}
+  SessionTypeToogleGroup: {fileID: 0}
+  inputlengthSession: {fileID: 0}
   SummaryText: {fileID: 0}
   EllapsedTimeInExperienceText: {fileID: 0}
+  NbOfClickMandatory: {fileID: 0}
+  NbOfClickFree: {fileID: 0}
   StartStopButton: {fileID: 0}
   Toggles: []
   experimentIsRunning: 0
@@ -76,4 +74,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentParticipantID: 
-  gameObjects: {fileID: 0}
+  sceneGameObjects: {fileID: 0}
+  OSCBroadcaster: {fileID: 0}

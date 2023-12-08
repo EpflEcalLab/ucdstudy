@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Windows;
 
-public class GameObjects : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
     //Participant ID
     public TextMeshProUGUI participantID;
@@ -17,45 +20,52 @@ public class GameObjects : MonoBehaviour
     //Session Type
     public ToggleGroup SessionTypeToogleGroup;
 
-    //lenght
-    public ToggleGroup LenghtToogleGroup;
+    //Input lenght Session
+    public TextMeshProUGUI inputlengthSession;
 
+    //Summary Text
     public TextMeshProUGUI SummaryText;
     public TextMeshProUGUI EllapsedTimeInExperienceText;
+    public TextMeshProUGUI NbOfClickMandatory;
+    public TextMeshProUGUI NbOfClickFree;
 
+    //Start stop Button
     public Button StartStopButton;
 
+    //Logic
     public List<Toggle> Toggles = new List<Toggle>();
-
     public bool experimentIsRunning = false;
-
     private float timeWhenButtonToStartWasPressed = 0;
+    private float lenghtOfFixedSessionsInSeconds = 5;
 
+    //Alert Menu
     public GameObject alertMenu;
     public Button closeAlertMenuButton;
     public TextMeshProUGUI alertMessage;
     public Image bgAlertMenu;
 
+    #region INIT
     public void Start()
     {
         CleanAll();
 
         Toggles = GameObject.FindObjectsOfType<Toggle>().ToList();
 
-        StartStopButton.onClick.AddListener(OnStartExperimentButtonPressed);
+        StartStopButton.onClick.AddListener(OnStartStopExperimentButtonPressed);
         closeAlertMenuButton.onClick.AddListener(OnCloseAlertMenuButtonPressed);
 
         alertMenu.SetActive(false);
 
     }
 
-
     public void CleanAll()
     {
         participantID.text = string.Empty;
         EllapsedTimeInExperienceText.text = string.Empty;
     }
+    #endregion
 
+    #region UPDATE
     public void Update()
     {
         UpdateExperimentString();
@@ -79,6 +89,7 @@ public class GameObjects : MonoBehaviour
         listToogleOn.Reverse();
         v_summaryExperimentText += string.Join("\n\n", listToogleOn);
 
+        v_summaryExperimentText += "\n\n Lenght Planned: " + inputlengthSession.text;
         SummaryText.text = v_summaryExperimentText;
     }
 
@@ -101,17 +112,19 @@ public class GameObjects : MonoBehaviour
             EllapsedTimeInExperienceText.text = string.Empty;
         }
     }
+    #endregion
 
-    private void OnStartExperimentButtonPressed()
+    #region STUDENT ACTION
+    public void OnStartStopExperimentButtonPressed()
     {
         //check if there is an ID
-        if(string.IsNullOrWhiteSpace(participantID.text))
+        if (string.IsNullOrWhiteSpace(participantID.text))
         {
             alertMenu.SetActive(true);
             return;
         }
 
-        if(experimentIsRunning == true)
+        if (experimentIsRunning == true)
         {
             experimentIsRunning = false;
             StartStopButton.gameObject.GetComponent<Image>().color = Color.green;
@@ -128,28 +141,47 @@ public class GameObjects : MonoBehaviour
             StartStopButton.transform.Find("text").GetComponent<TextMeshProUGUI>().text = "STOP";
             InputFieldForParticipantID.SetActive(false);
 
+            NbOfClickFree.text = "0";
+            NbOfClickMandatory.text = "0";
+
+            /*string v_stringValue = inputlengthSession.text.ToString();
+            int.TryParse(v_stringValue, out int lenghtOfFixedSessionsInSeconds);
+
+            bool success = int.TryParse(v_stringValue, out lenghtOfFixedSessionsInSeconds);
+
+            if (success)
+            {
+                Debug.Log("Converted number: " + lenghtOfFixedSessionsInSeconds);
+                // Perform your logic with the converted number
+            }
+            else
+            {
+                Debug.Log("Invalid input. Cannot convert to number.");
+            }*/
+
             InformGameManagerExperimentStarted();
         }
-    }
-
-    private void InformGameManagerExperimentStarted()
-    {
-        GameManager.Instance.OnExperimentStarted(participantID.text, 
-            FeedbackToogleGroup.ActiveToggles().FirstOrDefault().name, 
-            LenghtToogleGroup.ActiveToggles().FirstOrDefault().name, 
-            SessionTypeToogleGroup.ActiveToggles().FirstOrDefault().name);
-    }
-
-    private void InformGameManagerExperimentEnded()
-    {
-        GameManager.Instance.OnExperimentStopped(participantID.text);
     }
 
     private void OnCloseAlertMenuButtonPressed()
     {
         alertMenu.SetActive(false);
     }
+    #endregion
 
+    #region LOGIC
+    private void InformGameManagerExperimentStarted()
+    {
+        GameManager.Instance.OnStudentWishToStartExperiment(participantID.text,
+            FeedbackToogleGroup.ActiveToggles().FirstOrDefault().name,
+            lenghtOfFixedSessionsInSeconds,
+            SessionTypeToogleGroup.ActiveToggles().FirstOrDefault().name);
+    }
+
+    private void InformGameManagerExperimentEnded()
+    {
+        GameManager.Instance.OnStudentWishToStopExperiment(participantID.text);
+    }
 
     public void ShowAlertMenuWithMessage(string a_alertMessage, Color a_BGcolor)
     {
@@ -158,4 +190,28 @@ public class GameObjects : MonoBehaviour
 
         bgAlertMenu.color = a_BGcolor;
     }
+    #endregion
+
+    #region PARTICIPANT ACTION
+    public void OnMandatoryExperimentOver()
+    {
+        ShowAlertMenuWithMessage("Mandatory Over, wait for user", Color.yellow);
+    }
+
+    public void OnLaunchFreeTimeSession()
+    {
+        OnCloseAlertMenuButtonPressed();
+        timeWhenButtonToStartWasPressed = Time.realtimeSinceStartup;
+    }
+
+    public void OnUserClickedBoringButtonInMandatoryMode(string a_totalNbOfClick)
+    {
+        NbOfClickMandatory.text = "Total Clicked Mandatory: " + a_totalNbOfClick;
+    }
+
+    public void OnUserClickedBoringButtonInFreeMode(string a_totalNbOfClick)
+    {
+        NbOfClickFree.text = "Total Clicked Free: " + a_totalNbOfClick;
+    }
+    #endregion
 }
