@@ -13,7 +13,7 @@ public class GameManager : Singleton<GameManager>
     public string currentFeedbackType = string.Empty;
     public string currentLenghtType = string.Empty;
 
-    public UIManager sceneGameObjects;
+    public UIManager UImanager;
     public OSCBroadcaster OSCBroadcaster;
 
     public enum Status
@@ -30,7 +30,7 @@ public class GameManager : Singleton<GameManager>
     #region INIT
     public void Start()
     {
-        sceneGameObjects = GetComponent<UIManager>();
+        UImanager = GetComponent<UIManager>();
 
         DatabaseHandler v_databaseHandeler = gameObject.AddComponent<DatabaseHandler>();
         v_databaseHandeler.Init();
@@ -69,13 +69,13 @@ public class GameManager : Singleton<GameManager>
             currentLenghtType = "Free";
             OnStartExperiment();
             OSCBroadcaster.StartFreeExperiment();
-            sceneGameObjects.OnLaunchFreeTimeSession();
+            UImanager.OnLaunchFreeTimeSession();
         }
 
         else if(status == Status.FREE)
         {
             status = Status.OFF;
-            sceneGameObjects.OnStartStopExperimentButtonPressed();
+            UImanager.OnStartStopExperimentButtonPressed();
         }
     }
 
@@ -88,14 +88,14 @@ public class GameManager : Singleton<GameManager>
             if (participantsList.Any(x => x.ID == currentParticipantID))
             {
                 participantsList.Find(x => x.ID == currentParticipantID).OnUserClickedBoringButtonDuringMandatoryMode();
-                sceneGameObjects.OnUserClickedBoringButtonInMandatoryMode(
+                UImanager.OnUserClickedBoringButtonInMandatoryMode(
                     participantsList.Find(x => x.ID == currentParticipantID).GetTotalNumberOfClick());
             }
         }
         else if(status == Status.FREE)
         {
             participantsList.Find(x => x.ID == currentParticipantID).OnUserClickedBoringButtonDuringMandatoryMode();
-            sceneGameObjects.OnUserClickedBoringButtonInFreeMode(
+            UImanager.OnUserClickedBoringButtonInFreeMode(
                 participantsList.Find(x => x.ID == currentParticipantID).GetTotalNumberOfClick());
         }
 
@@ -149,7 +149,7 @@ public class GameManager : Singleton<GameManager>
     private void OnMandatoryExperimentStopped()
     {
         OnExperimentStopped(currentParticipantID);
-        sceneGameObjects.OnMandatoryExperimentOver();
+        UImanager.OnMandatoryExperimentOver();
         status = Status.WAITFORUSERTOSTARTAGAIN;
 
         OSCBroadcaster.ShowMessageMandatoryIsOverWaitForYou();
@@ -162,14 +162,14 @@ public class GameManager : Singleton<GameManager>
             currentParticipantID = a_participantID;
             participantsList.Find(x => x.ID == a_participantID).OnExperimentStopped();
 
-            sceneGameObjects.ShowAlertMenuWithMessage(
+            UImanager.ShowAlertMenuWithMessage(
                 "participant ID:\n " + a_participantID + "\n\n session recorded",
                 Color.white);
         }
         else
         {
             Debug.LogError("Can't find participant with the ID");
-            sceneGameObjects.ShowAlertMenuWithMessage(
+            UImanager.ShowAlertMenuWithMessage(
                 "Can't find participant ID:\n " + a_participantID + "\n\n session not recorded",
                 Color.red);
         }
