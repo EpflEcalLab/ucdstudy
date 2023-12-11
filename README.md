@@ -15,7 +15,9 @@ This project is financed by SNSF (Swiss National Science Foundation)
 
 The repository contains the UnityProject to set-up TouchDesigner and collect data
 
-![Scheme summary of the study and the containing interfaces](https://bitbucket.org/epflecallab/shamfeedbackstudy/src/master/Documentation/StudyDiagram.png)
+<p align="center">
+  <img src="./Documentation/StudyDiagram.png" alt="Scheme summary of the study and the containing interfaces"/>
+</p>
 
 * TouchDesigner can be set-up to choose 
 * the type of feedback (Tbor, Tgoo, Tbad, Tpas)
