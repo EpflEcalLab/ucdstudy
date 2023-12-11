@@ -2,7 +2,7 @@
 
 This repository has been created for the Sham Feedback Study in the context of
             Advancing NeuroFeedback for Tinnitus project (ANT)
-In collaboration with research groups from the domains of clinical neuroscience (University of Zurich, UZH, University Hospital Zurich, USZ) and cognitive psychology with user experience evaluation (Bern University of Applied Sciences and University of Fribourg, BFH-UFR), the consortium will be the first of its kind to address neurofeedback therapy for tinnitus from a multidisciplinary perspective.
+EPFL+ECAL Lab, in collaboration with research groups from the domains of clinical neuroscience (University of Zurich, UZH, University Hospital Zurich, USZ) and cognitive psychology with user experience evaluation (Bern University of Applied Sciences and University of Fribourg, BFH-UFR), the consortium will be the first of its kind to address neurofeedback therapy for tinnitus from a multidisciplinary perspective.
 
 Within the ANT project, many study are planned.
 The objective of the study encompassed within the repository
