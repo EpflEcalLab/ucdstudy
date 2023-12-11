@@ -50,7 +50,7 @@ public class GameManager : Singleton<GameManager>
             
         }
 
-        if (Input.GetKeyDown(KeyCode.W))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("Left button pressed");
             OnLeftMouseButtonClicked();
