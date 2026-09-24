@@ -13,10 +13,10 @@ This project is financed by the **Swiss National Science Foundation (SNSF)**.
 
 ### What is this repository for? ###
 
-The repository contains the UnityProject to set-up TouchDesigner and collect data
+The repository contains the Unity project used to set up TouchDesigner and collect data.
 
 <p align="center">
-  <img src="./Documentation/StudyDiagram.png" alt="Scheme summary of the study and the containing interfaces"/>
+  <img src="Documentation/StudyDiagram.png" alt="Scheme summarizing the study and its interfaces">
 </p>
 
 * TouchDesigner can be set-up to choose 
